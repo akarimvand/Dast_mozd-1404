@@ -82,7 +82,6 @@
     <div class="container py-4">
         <div class="text-center mb-4">
             <h1>محاسبه حقوق و دستمزد ۱۴۰۴</h1>
-            <p class="text-muted">برنامه نویس: امین ناصری کریموند</p>
         </div>
         
         <form id="salaryForm">
@@ -206,7 +205,7 @@
                 </div>
             </div>
 
-            <div class="text-center mt-4">
+            <div class="text-center mt-4" id="actionButtons">
                 <button type="button" class="btn btn-primary me-2" onclick="calculateSalary()" 
                         style="background-color: #1877f2; border: none; padding: 8px 20px;">
                     <i class="fas fa-calculator me-1"></i> محاسبه
@@ -217,6 +216,11 @@
                 </button>
             </div>
         </form>
+        
+        <div class="text-center mt-5 pt-4 border-top">
+            <p class="text-muted">برنامه نویس: امین ناصری کریموند</p>
+            <p class="text-muted">ایمیل: <a href="mailto:akarimvand@gmail.com">akarimvand@gmail.com</a></p>
+        </div>
     </div>
 
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
@@ -296,13 +300,17 @@
             }
         }
 
-        // Save screenshot
+        // Save screenshot (hides buttons)
         function saveAsImage() {
+            const buttons = document.getElementById('actionButtons');
+            buttons.style.display = 'none';
+            
             html2canvas(document.querySelector('.container')).then(canvas => {
                 const link = document.createElement('a');
                 link.download = 'salary-calculator-result.png';
                 link.href = canvas.toDataURL('image/png');
                 link.click();
+                buttons.style.display = '';
             });
         }
 
@@ -447,10 +455,19 @@
             loadHistory();
             calculateSalary();
             
-            // Add history dropdown to inputs
+            // Add clear-on-click and history to inputs
             document.querySelectorAll('input').forEach(input => {
                 input.addEventListener('focus', function() {
+                    if (this.value === this.defaultValue) {
+                        this.value = '';
+                    }
                     showHistory(this.id);
+                });
+                
+                input.addEventListener('blur', function() {
+                    if (this.value === '') {
+                        this.value = this.defaultValue;
+                    }
                 });
                 
                 input.addEventListener('change', function() {
