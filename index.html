@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>محاسبه حقوق</title>
+    <title>محاسبه حقوق و دستمزد ۱۴۰۴</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css">
     <style>
         @font-face {
@@ -18,6 +18,11 @@
         }
         .card {
             margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
         }
         .card-header {
             background-color: #0d6efd;
@@ -36,10 +41,50 @@
             color: #0d6efd;
         }
     </style>
+    <style>
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #121212;
+            color: #f8f9fa;
+        }
+        body.dark-mode .card {
+            background-color: #1e1e1e;
+            border-color: #333;
+        }
+        body.dark-mode .card-header {
+            background-color: #0a58ca;
+        }
+        body.dark-mode .form-control {
+            background-color: #2d2d2d;
+            color: #f8f9fa;
+            border-color: #444;
+        }
+        body.dark-mode .form-control:focus {
+            background-color: #2d2d2d;
+            color: #f8f9fa;
+            border-color: #0a58ca;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+        body.dark-mode .result-value {
+            color: #4dabf7;
+        }
+        body.dark-mode .btn-outline-secondary {
+            color: #f8f9fa;
+            border-color: #6c757d;
+        }
+    </style>
 </head>
 <body>
     <div class="container py-4">
-        <h1 class="text-center mb-4">محاسبه حقوق</h1>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="text-center mb-0">محاسبه حقوق و دستمزد ۱۴۰۴</h1>
+            <button id="darkModeToggle" class="btn btn-outline-secondary">
+                <i class="fas fa-moon"></i> حالت شب
+            </button>
+        </div>
+        <div class="text-center mb-4">
+            <p>برنامه نویس: امین ناصری کریموند | ایمیل: <a href="mailto:akarimvand@gmail.com">akarimvand@gmail.com</a></p>
+        </div>
         
         <form id="salaryForm">
             <!-- BOOTSTRAP_CARD_1 -->
@@ -163,7 +208,8 @@
             </div>
 
             <div class="text-center mt-3">
-                <button type="button" class="btn btn-primary" onclick="calculateSalary()">
+                <button type="button" class="btn btn-primary" onclick="calculateSalary()" 
+                        style="transition: all 0.3s ease;">
                     محاسبه
                 </button>
             </div>
@@ -171,6 +217,76 @@
     </div>
 
     <script>
+        // Dark mode toggle
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const body = document.body;
+        
+        // Check for saved dark mode preference
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            body.classList.add('dark-mode');
+            darkModeToggle.innerHTML = '<i class="fas fa-sun"></i> حالت روز';
+        }
+
+        darkModeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            if (body.classList.contains('dark-mode')) {
+                localStorage.setItem('darkMode', 'enabled');
+                darkModeToggle.innerHTML = '<i class="fas fa-sun"></i> حالت روز';
+            } else {
+                localStorage.setItem('darkMode', 'disabled');
+                darkModeToggle.innerHTML = '<i class="fas fa-moon"></i> حالت شب';
+            }
+        });
+
+        // Cookie functions
+        function setCookie(name, value, days) {
+            const date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            const expires = "expires=" + date.toUTCString();
+            document.cookie = name + "=" + value + ";" + expires + ";path=/";
+        }
+
+        function getCookie(name) {
+            const nameEQ = name + "=";
+            const ca = document.cookie.split(';');
+            for (let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) === ' ') c = c.substring(1);
+                if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length);
+            }
+            return null;
+        }
+
+        // Load saved values from cookies
+        function loadSavedValues() {
+            const inputs = ['ROZANEH', 'ZARIB', 'ROZ_KARKARD', 'S_EZAFE', 'AYAB', 'T_OLAD', 'TAHOL_STATUS', 'MANTAGHE_VIJHE'];
+            inputs.forEach(id => {
+                const value = getCookie(id);
+                if (value !== null) {
+                    const element = document.getElementById(id);
+                    if (element.tagName === 'SELECT') {
+                        element.value = value;
+                    } else {
+                        element.value = value;
+                    }
+                }
+            });
+            calculateSalary();
+        }
+
+        // Save values to cookies
+        function saveValues() {
+            const inputs = ['ROZANEH', 'ZARIB', 'ROZ_KARKARD', 'S_EZAFE', 'AYAB', 'T_OLAD', 'TAHOL_STATUS', 'MANTAGHE_VIJHE'];
+            inputs.forEach(id => {
+                const element = document.getElementById(id);
+                setCookie(id, element.value, 30);
+            });
+        }
+
+        // Add event listeners to save values on change
+        document.querySelectorAll('input, select').forEach(element => {
+            element.addEventListener('change', saveValues);
+        });
         // Function to format numbers with Persian digits and separators
         function formatNumber(num) {
             return new Intl.NumberFormat('fa-IR').format(num);
@@ -252,8 +368,28 @@
             document.getElementById('M_KHALES').textContent = formatNumber(Math.round(M_KHALES));
         }
 
-        // Initialize calculation on page load
-        window.onload = calculateSalary;
+        // Add event listeners for real-time calculation
+        document.querySelectorAll('input, select').forEach(element => {
+            element.addEventListener('input', calculateSalary);
+            element.addEventListener('change', calculateSalary);
+        });
+
+        // Initialize on page load
+        window.onload = function() {
+            loadSavedValues();
+            calculateSalary();
+        };
+
+        // Add hover animation to button
+        const calcButton = document.querySelector('.btn-primary');
+        calcButton.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+        });
+        calcButton.addEventListener('mouseleave', function() {
+            this.style.transform = '';
+            this.style.boxShadow = '';
+        });
     </script>
 </body>
 </html>
