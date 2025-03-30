@@ -14,20 +14,24 @@
         }
         body {
             font-family: 'Vazir', sans-serif;
-            background-color: #f8f9fa;
+            background-color: #f0f2f5;
         }
         .card {
             margin-bottom: 20px;
             transition: all 0.3s ease;
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
         }
         .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
         .card-header {
-            background-color: #0d6efd;
+            background-color: #1877f2;
             color: white;
             font-weight: bold;
+            border-radius: 8px 8px 0 0 !important;
         }
         .form-label {
             font-weight: bold;
@@ -76,14 +80,9 @@
 </head>
 <body>
     <div class="container py-4">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="text-center mb-0">محاسبه حقوق و دستمزد ۱۴۰۴</h1>
-            <button id="darkModeToggle" class="btn btn-outline-secondary">
-                <i class="fas fa-moon"></i> حالت شب
-            </button>
-        </div>
         <div class="text-center mb-4">
-            <p>برنامه نویس: امین ناصری کریموند | ایمیل: <a href="mailto:akarimvand@gmail.com">akarimvand@gmail.com</a></p>
+            <h1>محاسبه حقوق و دستمزد ۱۴۰۴</h1>
+            <p class="text-muted">برنامه نویس: امین ناصری کریموند</p>
         </div>
         
         <form id="salaryForm">
@@ -207,38 +206,107 @@
                 </div>
             </div>
 
-            <div class="text-center mt-3">
-                <button type="button" class="btn btn-primary" onclick="calculateSalary()" 
-                        style="transition: all 0.3s ease;">
-                    محاسبه
+            <div class="text-center mt-4">
+                <button type="button" class="btn btn-primary me-2" onclick="calculateSalary()" 
+                        style="background-color: #1877f2; border: none; padding: 8px 20px;">
+                    <i class="fas fa-calculator me-1"></i> محاسبه
+                </button>
+                <button type="button" class="btn btn-success" onclick="saveAsImage()"
+                        style="background-color: #42b72a; border: none; padding: 8px 20px;">
+                    <i class="fas fa-camera me-1"></i> ذخیره نتیجه
                 </button>
             </div>
         </form>
     </div>
 
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <script>
-        // Dark mode toggle
-        const darkModeToggle = document.getElementById('darkModeToggle');
-        const body = document.body;
-        
-        // Check for saved dark mode preference
-        if (localStorage.getItem('darkMode') === 'enabled') {
-            body.classList.add('dark-mode');
-            darkModeToggle.innerHTML = '<i class="fas fa-sun"></i> حالت روز';
+        // Input history functionality
+        const inputHistory = {};
+        const HISTORY_SIZE = 5;
+
+        function addToHistory(id, value) {
+            if (!inputHistory[id]) {
+                inputHistory[id] = [];
+            }
+            
+            // Remove if already exists
+            inputHistory[id] = inputHistory[id].filter(v => v !== value);
+            
+            // Add to beginning
+            inputHistory[id].unshift(value);
+            
+            // Keep only last HISTORY_SIZE items
+            if (inputHistory[id].length > HISTORY_SIZE) {
+                inputHistory[id].pop();
+            }
+            
+            localStorage.setItem('salaryHistory', JSON.stringify(inputHistory));
         }
 
-        darkModeToggle.addEventListener('click', () => {
-            body.classList.toggle('dark-mode');
-            if (body.classList.contains('dark-mode')) {
-                localStorage.setItem('darkMode', 'enabled');
-                darkModeToggle.innerHTML = '<i class="fas fa-sun"></i> حالت روز';
-            } else {
-                localStorage.setItem('darkMode', 'disabled');
-                darkModeToggle.innerHTML = '<i class="fas fa-moon"></i> حالت شب';
-            }
-        });
+        function showHistory(id) {
+            const element = document.getElementById(id);
+            const history = inputHistory[id] || [];
+            
+            if (history.length === 0) return;
+            
+            const container = document.createElement('div');
+            container.className = 'history-dropdown p-2';
+            container.style = `
+                position: absolute;
+                background: white;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                z-index: 100;
+                width: ${element.offsetWidth}px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            `;
+            
+            history.forEach(value => {
+                const item = document.createElement('div');
+                item.className = 'history-item p-2';
+                item.style.cursor = 'pointer';
+                item.textContent = value;
+                item.onclick = () => {
+                    element.value = value;
+                    container.remove();
+                    calculateSalary();
+                };
+                container.appendChild(item);
+            });
+            
+            element.parentNode.appendChild(container);
+            
+            // Close when clicking outside
+            setTimeout(() => {
+                document.addEventListener('click', function closeHandler(e) {
+                    if (!container.contains(e.target) && e.target !== element) {
+                        container.remove();
+                        document.removeEventListener('click', closeHandler);
+                    }
+                });
+            }, 0);
+        }
 
-        // Cookie functions
+        // Load history from localStorage
+        function loadHistory() {
+            const saved = localStorage.getItem('salaryHistory');
+            if (saved) {
+                Object.assign(inputHistory, JSON.parse(saved));
+            }
+        }
+
+        // Save screenshot
+        function saveAsImage() {
+            html2canvas(document.querySelector('.container')).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'salary-calculator-result.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+
+        // Modified cookie functions for history
         function setCookie(name, value, days) {
             const date = new Date();
             date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
@@ -376,8 +444,21 @@
 
         // Initialize on page load
         window.onload = function() {
-            loadSavedValues();
+            loadHistory();
             calculateSalary();
+            
+            // Add history dropdown to inputs
+            document.querySelectorAll('input').forEach(input => {
+                input.addEventListener('focus', function() {
+                    showHistory(this.id);
+                });
+                
+                input.addEventListener('change', function() {
+                    if (this.value) {
+                        addToHistory(this.id, this.value);
+                    }
+                });
+            });
         };
 
         // Add hover animation to button
