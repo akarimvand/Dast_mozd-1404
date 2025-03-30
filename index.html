@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محاسبه حقوق</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css">
+    <style>
+        @font-face {
+            font-family: 'Vazir';
+            src: url('https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/Vazir.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+        }
+        body {
+            font-family: 'Vazir', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .card {
+            margin-bottom: 20px;
+        }
+        .card-header {
+            background-color: #0d6efd;
+            color: white;
+            font-weight: bold;
+        }
+        .form-label {
+            font-weight: bold;
+        }
+        .form-control {
+            text-align: left;
+            direction: ltr;
+        }
+        .result-value {
+            font-weight: bold;
+            color: #0d6efd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-4">
+        <h1 class="text-center mb-4">محاسبه حقوق</h1>
+        
+        <form id="salaryForm">
+            <!-- BOOTSTRAP_CARD_1 -->
+            <div class="card">
+                <div class="card-header">اطلاعات پایه</div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="ROZANEH" class="form-label">حقوق روزانه</label>
+                            <input type="number" class="form-control" id="ROZANEH" value="0">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="ZARIB" class="form-label">ضریب کارگاهی</label>
+                            <input type="number" step="0.001" class="form-control" id="ZARIB" value="1.675">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="ROZ_KARKARD" class="form-label">روز کارکرد</label>
+                            <input type="number" class="form-control" id="ROZ_KARKARD" value="30">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="S_EZAFE" class="form-label">ساعت اضافه کار</label>
+                            <input type="number" class="form-control" id="S_EZAFE" value="50">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="AYAB" class="form-label">ایاب و ذهاب</label>
+                            <input type="number" step="0.001" class="form-control" id="AYAB" value="0">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="T_OLAD" class="form-label">تعداد اولاد</label>
+                            <select class="form-select" id="T_OLAD">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="TAHOL_STATUS" class="form-label">وضعیت تاهل</label>
+                            <select class="form-select" id="TAHOL_STATUS">
+                                <option value="مجرد">مجرد</option>
+                                <option value="متاهل">متاهل</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BOOTSTRAP_CARD_2 -->
+            <div class="card">
+                <div class="card-header">مزایای ثابت</div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="HAGH_MASKAN" class="form-label">حق مسکن</label>
+                            <input type="number" class="form-control" id="HAGH_MASKAN" value="90000000" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="BON" class="form-label">بن خواربار</label>
+                            <input type="number" class="form-control" id="BON" value="22000000" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="HAGH_TAHOL" class="form-label">حق تاهل</label>
+                            <input type="number" class="form-control" id="HAGH_TAHOL" value="0" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="HAGH_OLAD" class="form-label">حق اولاد</label>
+                            <input type="number" class="form-control" id="HAGH_OLAD" value="0" readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BOOTSTRAP_CARD_3 -->
+            <div class="card">
+                <div class="card-header">محاسبات</div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">مبلغ حقوق پایه</label>
+                            <div class="form-control-plaintext result-value" id="M_PAYE">0</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">مبلغ حقوق کارگاهی</label>
+                            <div class="form-control-plaintext result-value" id="M_KARGAHI">0</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">مبلغ اضافه کاری</label>
+                            <div class="form-control-plaintext result-value" id="M_EZAFEKAR">0</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">مبلغ ناخالص دریافتی</label>
+                            <div class="form-control-plaintext result-value" id="M_NAKHALES">0</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">بیمه</label>
+                            <div class="form-control-plaintext result-value" id="H_BIME">0</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">مبلغ مشمول مالیات</label>
+                            <div class="form-control-plaintext result-value" id="MASHMOL_MALYAT">0</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="MANTAGHE_VIJHE" class="form-label">منطقه ویژه</label>
+                            <select class="form-select" id="MANTAGHE_VIJHE">
+                                <option value="منطقه ویژه">منطقه ویژه</option>
+                                <option value="عادی">عادی</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">مالیات</label>
+                            <div class="form-control-plaintext result-value" id="MALYAT">0</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">مبلغ خالص دریافتی</label>
+                            <div class="form-control-plaintext result-value" id="M_KHALES">0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-3">
+                <button type="button" class="btn btn-primary" onclick="calculateSalary()">
+                    محاسبه
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Function to format numbers with Persian digits and separators
+        function formatNumber(num) {
+            return new Intl.NumberFormat('fa-IR').format(num);
+        }
+
+        // Function to calculate tax
+        function calculateTax(amount) {
+            let tax = 0;
+            
+            if (amount > 240000000) {
+                tax += Math.min(amount - 240000000, 60000000) * 0.1;
+            }
+            
+            if (amount > 300000000) {
+                tax += Math.min(amount - 300000000, 80000000) * 0.15;
+            }
+            
+            if (amount > 380000000) {
+                tax += Math.min(amount - 380000000, 120000000) * 0.2;
+            }
+            
+            if (amount > 500000000) {
+                tax += Math.min(amount - 500000000, 167000000) * 0.25;
+            }
+            
+            if (amount > 667000000) {
+                tax += (amount - 667000000) * 0.3;
+            }
+            
+            return tax;
+        }
+
+        // Main calculation function
+        function calculateSalary() {
+            // Get input values
+            const ROZANEH = parseFloat(document.getElementById('ROZANEH').value) || 0;
+            const ZARIB = parseFloat(document.getElementById('ZARIB').value) || 0;
+            const ROZ_KARKARD = parseFloat(document.getElementById('ROZ_KARKARD').value) || 0;
+            const S_EZAFE = parseFloat(document.getElementById('S_EZAFE').value) || 0;
+            const AYAB = parseFloat(document.getElementById('AYAB').value) || 0;
+            const T_OLAD = parseInt(document.getElementById('T_OLAD').value) || 0;
+            const TAHOL_STATUS = document.getElementById('TAHOL_STATUS').value;
+            const HAGH_MASKAN = parseFloat(document.getElementById('HAGH_MASKAN').value) || 0;
+            const BON = parseFloat(document.getElementById('BON').value) || 0;
+            const MANTAGHE_VIJHE = document.getElementById('MANTAGHE_VIJHE').value;
+
+            // Calculate dependent values
+            const HAGH_TAHOL = TAHOL_STATUS === 'متاهل' ? 5000000 : 0;
+            const HAGH_OLAD = T_OLAD * 10390968;
+
+            // Set dependent values
+            document.getElementById('HAGH_TAHOL').value = HAGH_TAHOL;
+            document.getElementById('HAGH_OLAD').value = HAGH_OLAD;
+
+            // Calculate salary components
+            const M_PAYE = ROZANEH * ROZ_KARKARD;
+            const M_KARGAHI = (ROZANEH * 0.675) * ROZ_KARKARD;
+            const M_EZAFEKAR = (((ROZANEH / 7.33) * S_EZAFE) * ZARIB) * 1.4;
+            const M_NAKHALES = M_PAYE + M_KARGAHI + M_EZAFEKAR + AYAB + HAGH_MASKAN + BON + HAGH_TAHOL + HAGH_OLAD;
+            const H_BIME = (M_NAKHALES - HAGH_OLAD) * 0.07;
+            const MASHMOL_MALYAT = M_NAKHALES - HAGH_OLAD;
+            let MALYAT = calculateTax(MASHMOL_MALYAT);
+            
+            // Apply special region discount if applicable
+            if (MANTAGHE_VIJHE === 'منطقه ویژه') {
+                MALYAT = MALYAT / 2;
+            }
+            
+            const M_KHALES = M_NAKHALES - H_BIME - MALYAT;
+
+            // Display results with formatting
+            document.getElementById('M_PAYE').textContent = formatNumber(Math.round(M_PAYE));
+            document.getElementById('M_KARGAHI').textContent = formatNumber(Math.round(M_KARGAHI));
+            document.getElementById('M_EZAFEKAR').textContent = formatNumber(Math.round(M_EZAFEKAR));
+            document.getElementById('M_NAKHALES').textContent = formatNumber(Math.round(M_NAKHALES));
+            document.getElementById('H_BIME').textContent = formatNumber(Math.round(H_BIME));
+            document.getElementById('MASHMOL_MALYAT').textContent = formatNumber(Math.round(MASHMOL_MALYAT));
+            document.getElementById('MALYAT').textContent = formatNumber(Math.round(MALYAT));
+            document.getElementById('M_KHALES').textContent = formatNumber(Math.round(M_KHALES));
+        }
+
+        // Initialize calculation on page load
+        window.onload = calculateSalary;
+    </script>
+</body>
+</html>
